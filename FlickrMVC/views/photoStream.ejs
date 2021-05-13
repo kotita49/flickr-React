@@ -1,0 +1,43 @@
+<!-- views/testView.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Example title</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link href="../testview.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body id="home">
+	<h1>Flickr</h1>
+	<div class="container">
+		<div class="row">
+		<%for(let i=0; i<images.length; i++){%>
+		
+			<div class="col-md-4 col-sm-6">
+	<div class="card" style="width: 18rem;">
+	<a href="<%= images[i] %>"><img class="card-img-top" src="<%= images[i] %>" alt=""></a>	
+			<div class="card-body">
+		  <h5 class="card-title"><%= title[i] %></h5>
+		  <p>by <a href=" <%= author[i] %>"> <%= name[i] %></a></p>	 			  
+		  <%if(tags[i]!==''){%>
+			  <p>Tags: <%= tags[i] %> </p>
+		  
+			  <% } else{ %>
+				<p></p>
+			  <% } %>
+				 
+		</div>	
+	</div>
+  </div>
+		
+	 
+	  <% };
+	  %>
+ </div>
+		
+</div>
+</body>
+</html>
