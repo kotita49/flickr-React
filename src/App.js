@@ -1,106 +1,270 @@
-
-
 import React, { Component } from 'react'
 import './App.css'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
-
+function Search(props) {
+  return (
+    <div class="card">
+      <img class="image" src={props.photo.media} alt={props.photo.title} />
+      <div class="details">
+        <h3 class="title">
+          {' '}
+          <a href={props.photo.link} target="_blank">
+            {props.photo.title}{' '}
+          </a>
+        </h3>
+        <h3 class="author">
+          {' '}
+          by{' '}
+          <a href={props.photo.author_link} target="_blank">
+            {props.photo.author}
+          </a>
+        </h3>
+      </div>
+      <div class="description">
+        <p>
+          {' '}
+          Posted on: {props.photo.date} at {props.photo.time}.{' '}
+        </p>
+      </div>
+      <div class="tags">
+        <p>{props.photo.tags}</p>
+      </div>
+    </div>
+  )
+}
 
 class App extends Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.state = {
-      photos: [],
+      items: 20,
+      pictures: [],
+      page: 1,
+      loading: false,
+      search: null,
     }
   }
 
-  componentDidMount() {
-    fetch(
+  componentDidMount = () => {
+    this.fetchData(this.state.page)
+  }
+
+  fetchData = (pageNumber) => {
+    let url =
       'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=' +
-        process.env.REACT_APP_API_KEY +
-        '&format=json&lang?en&safe_search=1&tags=safe,pets&extras=owner_name,url_s,url_m,url_l,tags&nojsoncallback=1',
-    )
+      process.env.REACT_APP_API_KEY +
+      '&format=json&page=' +
+      pageNumber +
+      '&lang?en&safe_search=1&tags=nature&extras=owner_name,url_s,url_m,url_l,date_taken,description,tags&nojsoncallback=1'
+    this.setState({
+      loading: true,
+    })
+    fetch(url)
       .then(function (response) {
         return response.json()
       })
       .then(
         function (data) {
-          let allPhotos = data.photos.photo.map((ph) => {
-            var title = ph.title
-            var imgUrl =
+          let pictures = []
+          data.photos.photo.map((pic) => {
+            var title = pic.title
+            var media =
               'https://farm' +
-              ph.farm +
+              pic.farm +
               '.staticflickr.com/' +
-              ph.server +
+              pic.server +
               '/' +
-              ph.id +
+              pic.id +
               '_' +
-              ph.secret +
+              pic.secret +
               '.jpg'
-            var name = ph.ownername
-            var tags = ph.tags
+            var date = new Date(pic.datetaken).toLocaleDateString('en-GB', {
+              weekday: 'long',
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            })
+            var time = new Date(pic.datetaken).toLocaleTimeString('en-GB', {
+              hour: 'numeric',
+              minute: 'numeric',
+              hour12: true,
+            })
+            var author = pic.ownername
+            if (pic.tags === '') {
+              var tags = ''
+            } else {
+              var tags_end = pic.tags.split(' ').join(', #')
+              var tags_start = 'Tags: #'
+              var tags = tags_start + tags_end
+            }
             var link =
-              'https://www.flickr.com/photos/' + ph.owner + '/' + ph.id + '/'
-            var owner_link = 'https://www.flickr.com/photos/' + ph.owner + '/'
+              'https://www.flickr.com/photos/' + pic.owner + '/' + pic.id + '/'
+            var author_link = 'https://www.flickr.com/photos/' + pic.owner + '/'
 
-            return (
-              <div class="card">
-                <img class="image" src={imgUrl} alt={title} />
-                <div class="details">
-                  <h3 class="title">
-                    {' '}
-                    <a href={link} target="_blank">
-                      {title}{' '}
-                    </a>
-                  </h3>
-                  <h3 class="author">
-                    {' '}
-                    by{' '}
-                    <a href={owner_link} target="_blank">
-                      {name}
-                    </a>
-                  </h3>
-                </div>
-                <div class="tags">
-                  <p> Tags: #{tags}</p>
-                </div>
-              </div>
-            )
+            var pic = {
+              title: title,
+              media: media,
+              date: date,
+              time: time,
+              author: author,
+              tags: tags,
+              link: link,
+              author_link: author_link,
+            }
+            pictures.push(pic)
           })
-          this.setState({ photos: allPhotos })
+          this.setState({
+            pictures: [...this.state.pictures, ...pictures],
+          })
+          this.setState({
+            loading: false,
+          })
         }.bind(this),
       )
       .catch((err) => {
         console.log(err)
       })
-      
   }
-  
+  loadFunc = () => {
+    setTimeout(() => {
+      this.setState({ items: this.state.items + 20, loading: false })
+    }, 1000)
+  }
+
+  fetchSearchData = (pageNumber, searchQuery) => {
+    this.setState({
+      loading: true,
+    })
+    let url =
+      'https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=' +
+      process.env.REACT_APP_API_KEY +
+      '&format=json&page=' +
+      pageNumber +
+      '&lang?en&safe_search=1&text=' +
+      searchQuery +
+      '&extras=owner_name,url_s,url_m,url_l,date_taken,description,tags&nojsoncallback=1'
+    fetch(url)
+      .then(function (response) {
+        return response.json()
+      })
+      .then(
+        function (data) {
+          let pictures = []
+          data.photos.photo.map((pic) => {
+            var title = pic.title
+            var media =
+              'https://farm' +
+              pic.farm +
+              '.staticflickr.com/' +
+              pic.server +
+              '/' +
+              pic.id +
+              '_' +
+              pic.secret +
+              '.jpg'
+            var date = new Date(pic.datetaken).toLocaleDateString('en-GB', {
+              weekday: 'long',
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            })
+            var time = new Date(pic.datetaken).toLocaleTimeString('en-GB', {
+              hour: 'numeric',
+              minute: 'numeric',
+              hour12: true,
+            })
+            var author = pic.ownername
+            if (pic.tags === '') {
+              var tags = ''
+            } else {
+              var tags_end = pic.tags.split(' ').join(', #')
+              var tags_start = 'Tags: #'
+              var tags = tags_start + tags_end
+            }
+            var link =
+              'https://www.flickr.com/photos/' + pic.owner + '/' + pic.id + '/'
+            var author_link = 'https://www.flickr.com/photos/' + pic.owner + '/'
+
+            var pic = {
+              title: title,
+              media: media,
+              date: date,
+              time: time,
+              author: author,
+              tags: tags,
+              link: link,
+              author_link: author_link,
+            }
+            pictures.push(pic)
+          })
+          this.setState({
+            pictures: [...this.state.pictures, ...pictures],
+          })
+          this.setState({
+            loading: false,
+          })
+        }.bind(this),
+      )
+      .catch((err) => {
+        console.log(err)
+      })
+  }
+
+  mySubmitHandler = (event) => {
+    event.preventDefault()
+    this.setState({ pictures: [], page: 1 })
+    this.fetchSearchData(this.state.page, this.state.search)
+    this.setState({ loading: true })
+  }
+  myChangeHandler = (event) => {
+    this.setState({ search: event.target.value })
+  }
 
   render() {
     return (
       <body id="home">
-        <h1>Flickr </h1>
+        <h1>Flickr</h1>
+
+        <div id="top" class="search">
+          <form onSubmit={this.mySubmitHandler}>
+            <input
+              class="form-search"
+              type="search"
+              placeholder="search"
+              aria-label="Search"
+              onChange={this.myChangeHandler}
+            />
+            <button class="btn-search" type="submit">
+              Go!
+            </button>
+          </form>
+        </div>
         <div>
-        
-                  <InfiniteScroll
-            dataLength={this.state.photos.length}
-               endMessage={
+          <InfiniteScroll
+            dataLength={this.state.pictures.length}
+            next={this.loadFunc}
+            hasMore={true}
+            loader={<h4>Loading...</h4>}
+            endMessage={
               <p style={{ textAlign: 'center' }}>
-                <b>Now you have seen it all!</b>
+                <b>Yay! You have seen it all</b>
               </p>
             }
           >
             <div class="container">
-               
-              {this.state.photos}
-              </div>
+              {this.state.pictures.map((photodata) => (
+                <Search photo={photodata} />
+              ))}
+            </div>
           </InfiniteScroll>
+          <a class="footer" href="#home">
+            Back to top
+          </a>
         </div>
       </body>
     )
   }
 }
-
 
 export default App
