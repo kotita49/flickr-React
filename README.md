@@ -2,7 +2,7 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 Run npm install at the root of your directory. You will need to create .env file in the project root folder, enter your REACT_APP_API_KEY="your-api-key"  which you can obtain from [here](https://www.flickr.com/services/api/keys). 
-Cd to flickr-app, then:
+Change directory to flickr-app, then:
 ### `npm start`
 
 Runs the app in the development mode.\
