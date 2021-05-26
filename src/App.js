@@ -161,7 +161,6 @@ class App extends React.Component {
     return (
       <body id="home">
         <h1>Flickr</h1>
-
         <div id="top" class="search">
           <form onSubmit={this.mySubmitHandler}>
             <input
@@ -181,22 +180,19 @@ class App extends React.Component {
             dataLength={this.state.pictures.length}
             next={() => this.fetchPage(this.state.pageNumber + 1)}
             hasMore={true}
-            loader={<h4>Loading...</h4>}
+            loader={<h5 className="loading">Loading...</h5>}
             endMessage={
-              <p style={{ textAlign: 'center' }}>
+              <p>
                 <b>Yay! You have seen it all</b>
               </p>
             }
           >
-            <div class="container">
+            <div className="container">
               {this.state.pictures.map((photodata) => (
                 <Search photo={photodata} />
               ))}
             </div>
           </InfiniteScroll>
-          <a class="footer" href="#home">
-            Back to top
-          </a>
         </div>
       </body>
     )
