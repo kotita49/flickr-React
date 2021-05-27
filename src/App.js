@@ -1,6 +1,8 @@
 import React from 'react'
 import './App.css'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCoffee, faSearch } from '@fortawesome/free-solid-svg-icons'
 
 function Search(props) {
   return (
@@ -171,7 +173,7 @@ class App extends React.Component {
               onChange={this.myChangeHandler}
             />
             <button class="btn-search" type="submit">
-              Go!
+            <FontAwesomeIcon icon={faSearch}/>
             </button>
           </form>
         </div>
@@ -180,7 +182,7 @@ class App extends React.Component {
             dataLength={this.state.pictures.length}
             next={() => this.fetchPage(this.state.pageNumber + 1)}
             hasMore={true}
-            loader={<h5 className="loading">Loading...</h5>}
+            loader={<p className="loading"> <FontAwesomeIcon icon={faCoffee}/></p>}
             endMessage={
               <p>
                 <b>Yay! You have seen it all</b>
